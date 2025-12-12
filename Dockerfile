@@ -21,14 +21,11 @@ FROM nginx:alpine
 # Copy built files from builder
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Copy nginx configuration if exists
+# Copy nginx configuration
 COPY nginx.conf /etc/nginx/nginx.conf
 
 # Expose port 8080 for Cloud Run
 EXPOSE 8080
-
-# Update nginx to listen on port 8080
-RUN sed -i 's/listen\s*80;/listen 8080;/' /etc/nginx/conf.d/default.conf || true
 
 # Start nginx
 CMD ["nginx", "-g", "daemon off;"]
