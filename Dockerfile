@@ -1,31 +1,23 @@
-# Build stage
-FROM node:20-alpine AS builder
+# Use Node.js LTS as base image
+FROM node:20-alpine
 
 WORKDIR /app
 
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
+# Install ALL dependencies (including dev)
 RUN npm install
 
-# Copy application files
+# Copy all application files
 COPY . .
-
-# Build the Vite application
-RUN npm run build
-
-# Production stage - serve with nginx
-FROM nginx:alpine
-
-# Copy built files from builder
-COPY --from=builder /app/dist /usr/share/nginx/html
-
-# Copy nginx configuration
-COPY nginx.conf /etc/nginx/nginx.conf
 
 # Expose port 8080 for Cloud Run
 EXPOSE 8080
 
-# Start nginx
-CMD ["nginx", "-g", "daemon off;"]
+# Set environment variable for Vite
+ENV PORT=8080
+ENV HOST=0.0.0.0
+
+# Start Vite dev server
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "8080"]
